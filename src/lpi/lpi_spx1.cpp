@@ -3,7 +3,7 @@
 /*                  This file is part of the program and library             */
 /*         SCIP --- Solving Constraint Integer Programs                      */
 /*                                                                           */
-/*    Copyright (C) 2002-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 2002-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SCIP is distributed under the terms of the ZIB Academic License.         */
@@ -13,7 +13,7 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file   lpi_spx.cpp
+/**@file   lpi_spx1.cpp
  * @ingroup LPIS
  * @brief  LP interface for SoPlex version 1.4 and higher
  * @author Tobias Achterberg
@@ -610,7 +610,7 @@ public:
    {
       for( int i = 0; i < nCols(); ++i )
       {
-         if( lower(i) > upper(i) )
+         if( lower(i) > upper(i) + Param::epsilon() )
          {
             SCIPerrorMessage("inconsistent bounds on column %d: lower=%.17g, upper=%.17g\n",
                i, lower(i), upper(i));
@@ -625,7 +625,7 @@ public:
    {
       for( int i = 0; i < nRows(); ++i )
       {
-         if( lhs(i) > rhs(i) )
+         if( lhs(i) > rhs(i) + Param::epsilon() )
          {
             SCIPerrorMessage("inconsistent sides on row %d: lhs=%.17g, rhs=%.17g\n",
                i, lhs(i), rhs(i));
@@ -1584,9 +1584,9 @@ const char* SCIPlpiGetSolverName(
    SCIPdebugMessage("calling SCIPlpiGetSolverName()\n");
 
 #if (SOPLEX_SUBVERSION > 0)
-   sprintf(spxname, "SoPlex %d.%d.%d.%d", SOPLEX_VERSION/100, (SOPLEX_VERSION % 100)/10, SOPLEX_VERSION % 10, SOPLEX_SUBVERSION); /*lint !e778*/
+   sprintf(spxname, "SoPlex1 %d.%d.%d.%d", SOPLEX_VERSION/100, (SOPLEX_VERSION % 100)/10, SOPLEX_VERSION % 10, SOPLEX_SUBVERSION); /*lint !e778*/
 #else
-   sprintf(spxname, "SoPlex %d.%d.%d", SOPLEX_VERSION/100, (SOPLEX_VERSION % 100)/10, SOPLEX_VERSION % 10); /*lint !e778*/
+   sprintf(spxname, "SoPlex1 %d.%d.%d", SOPLEX_VERSION/100, (SOPLEX_VERSION % 100)/10, SOPLEX_VERSION % 10); /*lint !e778*/
 #endif
    return spxname;
 }
@@ -2036,7 +2036,7 @@ SCIP_RETCODE SCIPlpiChgBounds(
       {
          assert(0 <= ind[i] && ind[i] < lpi->spx->nCols());
          lpi->spx->changeBounds(ind[i], lb[i], ub[i]);
-         assert(lpi->spx->lower(ind[i]) <= lpi->spx->upper(ind[i]));
+         assert(lpi->spx->lower(ind[i]) <= lpi->spx->upper(ind[i]) + Param::epsilon());
       }
    }
    catch( const SPxException& x )
@@ -2080,7 +2080,7 @@ SCIP_RETCODE SCIPlpiChgSides(
       {
          assert(0 <= ind[i] && ind[i] < lpi->spx->nRows());
          lpi->spx->changeRange(ind[i], lhs[i], rhs[i]);
-         assert(lpi->spx->lhs(ind[i]) <= lpi->spx->rhs(ind[i]));
+         assert(lpi->spx->lhs(ind[i]) <= lpi->spx->rhs(ind[i]) + Param::epsilon());
       }
    }
    catch( const SPxException& x )
@@ -4945,6 +4945,11 @@ SCIP_RETCODE SCIPlpiGetIntpar(
       *ival = (int) lpi->spx->getTiming();
       break;
 #endif
+#if SOPLEX_VERSION >= 230 || (SOPLEX_VERSION == 220 && SOPLEX_SUBVERSION >= 3)
+   case SCIP_LPPAR_RANDOMSEED:
+      *ival = (int) lpi->spx->random.getSeed();
+      break;
+#endif
    default:
       return SCIP_PARAMETERUNKNOWN;
    }  /*lint !e788*/
@@ -5019,6 +5024,12 @@ SCIP_RETCODE SCIPlpiSetIntpar(
       lpi->spx->setTiming((Timer::TYPE) ival);
       break;
 #endif
+#if SOPLEX_VERSION >= 230 || (SOPLEX_VERSION == 220 && SOPLEX_SUBVERSION >= 3)
+   case SCIP_LPPAR_RANDOMSEED:
+      lpi->spx->random.setSeed((unsigned int) ival);
+      break;
+#endif
+
    default:
       return SCIP_PARAMETERUNKNOWN;
    }  /*lint !e788*/
