@@ -13,31 +13,30 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file   struct_random.h
- * @brief  data structures for random number generator
- * @author Jakob Witzig
+/**@file   cons_components.h
+ * @brief  constraint handler for handling independent components
+ * @author Gerald Gamrath
+ *
+ * This constraint handler looks for independent components.
  */
 
 /*---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----0----+----1----+----2*/
 
-#ifndef __SCIP_STRUCT_RANDOM_H__
-#define __SCIP_STRUCT_RANDOM_H__
+#ifndef __SCIP_CONS_COMPONENTS_H__
+#define __SCIP_CONS_COMPONENTS_H__
 
-#include "scip/def.h"
-#include "scip/type_random.h"
+
+#include "scip/scip.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/** random number generator data */
-struct SCIP_RandGen
-{
-   unsigned int          seed;               /**< start seed */
-   unsigned int          xor_seed;           /**< Xorshift seed */
-   unsigned int          mwc_seed;           /**< Multiply-with-carry seed */
-   unsigned int          cst_seed;           /**< constant seed */
-};
+/** creates the components constraint handler and includes it in SCIP */
+EXTERN
+SCIP_RETCODE SCIPincludeConshdlrComponents(
+   SCIP*                 scip                /**< SCIP data structure */
+   );
 
 #ifdef __cplusplus
 }

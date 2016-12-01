@@ -13,24 +13,32 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file   type_random.h
- * @brief  type definitions for random number generator
- * @author Jakob Witzig
+/**@file   tpi_openmp.h
+ * @ingroup TASKINTERFACE
+ * @brief  the tpi_openmp redefines the lock functionality and some condition functionality as macros
+ * @author Robert Lion Gottwald
+ * @author Stephen J. Maher
  */
 
 /*---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----0----+----1----+----2*/
 
-#ifndef __SCIP_TYPE_RANDOM_H__
-#define __SCIP_TYPE_RANDOM_H__
+#ifdef TPI_OMP
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifndef _TPI_OPENMP_H_
+#define _TPI_OPENMP_H_
 
-typedef struct SCIP_RandGen SCIP_RANDGEN;    /**< random number generator data */
+/* define locks and some condition functionality as macros */
 
-#ifdef __cplusplus
-}
+/* lock */
+#define SCIPtpiInitLock(lock)     (omp_init_lock(lock), SCIP_OKAY)
+#define SCIPtpiDestroyLock(lock)  (omp_destroy_lock(lock))
+#define SCIPtpiAcquireLock(lock)   (omp_set_lock(lock), SCIP_OKAY)
+#define SCIPtpiReleaseLock(lock)  (omp_unset_lock(lock), SCIP_OKAY)
+
+/* condition */
+#define SCIPtpiInitCondition(condition)    ( omp_init_lock(&(condition)->_lock), \
+                                             (condition)->_waiters = 0, (condition)->_waitnum = 0, (condition)->_signals = 0, SCIP_OKAY )
+#define SCIPtpiDestroyCondition(condition) do { assert((condition)->_waiters == 0); assert((condition)->_waitnum == 0); assert((condition)->_signals == 0); omp_destroy_lock(&(condition)->_lock); } while(0)
 #endif
 
 #endif
