@@ -13,39 +13,32 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file   presol_components.h
- * @ingroup PRESOLVERS
- * @brief  components presolver
- * @author Dieter Weninger
- * @author Gerald Gamrath
- *
- * This presolver looks for independent components at the end of the presolving.
- * If independent components are found in which a maximum number of discrete variables
- * is not exceeded, the presolver tries to solve them in advance as subproblems.
- * Afterwards, if a subproblem was solved to optimality, the corresponding
- * variables/constraints can be fixed/deleted in the main problem.
+/**@file   tpi_openmp.h
+ * @ingroup TASKINTERFACE
+ * @brief  the tpi_openmp redefines the lock functionality and some condition functionality as macros
+ * @author Robert Lion Gottwald
+ * @author Stephen J. Maher
  */
 
 /*---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----0----+----1----+----2*/
 
-#ifndef __SCIP_PRESOL_COMPONENTS_H__
-#define __SCIP_PRESOL_COMPONENTS_H__
+#ifdef TPI_OMP
 
+#ifndef _TPI_OPENMP_H_
+#define _TPI_OPENMP_H_
 
-#include "scip/scip.h"
+/* define locks and some condition functionality as macros */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+/* lock */
+#define SCIPtpiInitLock(lock)     (omp_init_lock(lock), SCIP_OKAY)
+#define SCIPtpiDestroyLock(lock)  (omp_destroy_lock(lock))
+#define SCIPtpiAcquireLock(lock)   (omp_set_lock(lock), SCIP_OKAY)
+#define SCIPtpiReleaseLock(lock)  (omp_unset_lock(lock), SCIP_OKAY)
 
-/** creates the components presolver and includes it in SCIP */
-EXTERN
-SCIP_RETCODE SCIPincludePresolComponents(
-   SCIP*                 scip                /**< SCIP data structure */
-   );
-
-#ifdef __cplusplus
-}
+/* condition */
+#define SCIPtpiInitCondition(condition)    ( omp_init_lock(&(condition)->_lock), \
+                                             (condition)->_waiters = 0, (condition)->_waitnum = 0, (condition)->_signals = 0, SCIP_OKAY )
+#define SCIPtpiDestroyCondition(condition) do { assert((condition)->_waiters == 0); assert((condition)->_waitnum == 0); assert((condition)->_signals == 0); omp_destroy_lock(&(condition)->_lock); } while(0)
 #endif
 
 #endif
