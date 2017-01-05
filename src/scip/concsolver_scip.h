@@ -13,43 +13,27 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file   probdata_lop.h
- * @brief  handling of data needed for solving linear ordering problems
- * @author Marc Pfetsch
+/**@file   concsolver_scip.h
+ * @ingroup PARALLEL
+ * @brief  implementation of concurrent solver interface for SCIP
+ * @author Robert Lion Gottwald
  */
 
-#ifndef __LOP_PROBDATA_LOP__
-#define __LOP_PROBDATA_LOP__
+/*---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----0----+----1----+----2*/
 
-#include <scip/scip.h>
+#ifndef __SCIP_CONCSOLVER_SCIP_H__
+#define __SCIP_CONCSOLVER_SCIP_H__
+
+#include "scip/scip.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/** create linear ordering problem instance */
-extern
-SCIP_RETCODE LOPcreateProb(
-   SCIP*                 scip,               /**< SCIP data structure */
-   const char*           filename            /**< name of file to read */
-   );
-
-/** create linear ordering problem model */
-extern
-SCIP_RETCODE LOPgenerateModel(
-   SCIP*                 scip                /**< SCIP data structure */
-   );
-
-/** evalutate solution */
-extern
-SCIP_RETCODE LOPevalSolution(
-   SCIP*                 scip                /**< SCIP data structure */
-   );
-
-/** return the number of elements */
-extern
-int LOPgetNElements(
-   SCIP*                 scip                /**< SCIP data structure */
+/** creates the concurrent SCIP solver plugins and includes them in SCIP */
+EXTERN
+SCIP_RETCODE SCIPincludeConcurrentScipSolvers(
+   SCIP*                 scip                /**< SCIP datastructure */
    );
 
 #ifdef __cplusplus
