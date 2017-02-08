@@ -3,7 +3,7 @@
 /*                  This file is part of the program and library             */
 /*         SCIP --- Solving Constraint Integer Programs                      */
 /*                                                                           */
-/*    Copyright (C) 2002-2016 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 2002-2017 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SCIP is distributed under the terms of the ZIB Academic License.         */
@@ -13,21 +13,27 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file   xternal.c
+/**@file   xternal_gmi.c
  * @brief  main document page
- * @author Stefan Vigerske
+ * @author Marc Pfetsch
  */
 
 /*--+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----0----+----1----+----2*/
 
-/**@mainpage Callable Library Example
- * @author   Stefan Vigerske
+/**@page GMI_MAIN Gomory Mixed Integer Cut Example
+ * @version  1.0
+ * @author   Giacomo Nannicini
+ * @author   Marc Pfetsch
  *
- * This example illustrates how to setup nonlinear constraints when using SCIP as callable library.
- * The example implements several small models that use specific types of constraints.
  *
- * - string.c shows how to setup general nonlinear and quadratic constraints
- * - gastrans.c shows how to setup absolute power constraints
- * - circle.c shows how to setup second-order-cone constraints
+ * This example provides a textbook implementation of Gomory mixed integer (GMI) cuts.
+ *
+ * The default implementation in SCIP does not produce GMI cuts in the strict sense, since it applies the CMIR function
+ * to the aggregated row. This function can, among other things, take variable bounds into account. Thus, the resulting
+ * cuts cannot be used for comparison with standard GMI cuts. This example remedies this situation.
+ *
+ * The implementation has been used in the paper@p
+ * G. Cornuejols, F. Margot and G. Nannicini:@n
+ * On the safety of Gomory cut generators.@n
+ * Preprint 2012.
  */
-

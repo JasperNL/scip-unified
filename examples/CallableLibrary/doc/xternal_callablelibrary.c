@@ -3,7 +3,7 @@
 /*                  This file is part of the program and library             */
 /*         SCIP --- Solving Constraint Integer Programs                      */
 /*                                                                           */
-/*    Copyright (C) 2002-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 2002-2017 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SCIP is distributed under the terms of the ZIB Academic License.         */
@@ -13,34 +13,21 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file   heur_activecons.h
- * @ingroup PRIMALHEURISTICS
- * @brief  activecons primal heuristic
- * @author Tobias Achterberg
- *
- * template file for primal heuristic plugins
+/**@file   xternal.c
+ * @brief  main document page
+ * @author Stefan Vigerske
  */
 
-/*---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----0----+----1----+----2*/
+/*--+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----0----+----1----+----2*/
 
-#ifndef __SCIP_HEUR_ACTIVECONS_H__
-#define __SCIP_HEUR_ACTIVECONS_H__
+/**@page CALLABLELIBRARY_MAIN Callable Library Example
+ * @author   Stefan Vigerske
+ *
+ * This example illustrates how to setup nonlinear constraints when using SCIP as callable library.
+ * The example implements several small models that use specific types of constraints.
+ *
+ * - string.c shows how to setup general nonlinear and quadratic constraints
+ * - gastrans.c shows how to setup absolute power constraints
+ * - circle.c shows how to setup second-order-cone constraints
+ */
 
-
-#include "scip/scip.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/** creates the activecons primal heuristic and includes it in SCIP */
-EXTERN
-SCIP_RETCODE SCIPincludeHeurActivecons(
-   SCIP*                 scip                /**< SCIP data structure */
-   );
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
