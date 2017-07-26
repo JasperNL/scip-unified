@@ -56,6 +56,8 @@ OPTCOMMAND=${23}
 SETCUTOFF=${24}
 VISUALIZE=${25}
 
+SOLVER=fscip
+
 # check if all variables defined (by checking the last one)
 if test -z $VISUALIZE
 then
@@ -103,7 +105,7 @@ else
 fi
 # call routines for creating the result directory, checking for existence
 # of passed settings, etc
-. ./configuration_set.sh $BINNAME $TSTNAME $SETNAMES $TIMELIMIT $TIMEFORMAT $MEMLIMIT $MEMFORMAT $DEBUGTOOL $SETCUTOFF
+. ./configuration_set_fscip.sh $BINNAME $TSTNAME $SETNAMES $TIMELIMIT $TIMEFORMAT $MEMLIMIT $MEMFORMAT $DEBUGTOOL $SETCUTOFF
 
 
 # at the first time, some files need to be initialized. set to "" after the innermost loop
@@ -150,7 +152,7 @@ do
 	    for SETNAME in ${SETTINGSLIST[@]}
 	    do
 		# infer the names of all involved files from the arguments
-		. ./configuration_logfiles.sh $INIT $COUNT $INSTANCE $BINID $PERMUTE $SEEDS $SETNAME $TSTNAME $CONTINUE $QUEUE $p $s
+		. ./configuration_logfiles_fscip.sh $INIT $COUNT $INSTANCE $BINID $PERMUTE $SEEDS $SETNAME $TSTNAME $CONTINUE $QUEUE $THREADS $p $s
 
 		# skip instance if log file is present and we want to continue a previously launched test run
 		if test "$SKIPINSTANCE" = "true"
@@ -161,20 +163,9 @@ do
 		# find out the solver that should be used
 		SOLVER=`stripversion $BINNAME`
 
-		CONFFILE="configuration_tmpfile_setup_${SOLVER}.sh"
-
-		# call tmp file configuration for the solver
-		. ./${CONFFILE} $INSTANCE $SCIPPATH $TMPFILE $SETNAME $SETFILE $THREADS $SETCUTOFF \
-		    $FEASTOL $TIMELIMIT $MEMLIMIT $NODELIMIT $LPS $DISPFREQ $REOPT $OPTCOMMAND $CLIENTTMPDIR $FILENAME $SETCUTOFF $VISUALIZE $SOLUFILE
-
-
 		JOBNAME="`capitalize ${SOLVER}`${SHORTPROBNAME}"
-		if test "$SOLVER" = "scip"
-		then
-		    export EXECNAME=${DEBUGTOOLCMD}$SCIPPATH/../$BINNAME
-		else
-		    export EXECNAME=$BINNAME
-		fi
+
+		export EXECNAME=$SCIPPATH/../bin/$BINNAME
 
 		# check queue type
 		if test  "$QUEUETYPE" = "srun"
@@ -188,15 +179,17 @@ do
 		    export HARDMEMLIMIT
 		    export CHECKERPATH=$SCIPPATH/solchecker
 		    export SETFILE
+                    export SETNAME
+                    export THREADS
 		    export TIMELIMIT
 		    # the space at the end is necessary
 		    export SRUN="srun --cpu_bind=cores -v -v "
-		    sbatch --job-name=${JOBNAME} --mem=$HARDMEMLIMIT -p $CLUSTERQUEUE -A $ACCOUNT $NICE --time=${HARDTIMELIMIT} --cpu-freq=highm1 ${EXCLUSIVE} --output=/dev/null run.sh
+		    sbatch --job-name=${JOBNAME} --mem=$HARDMEMLIMIT -p $CLUSTERQUEUE -A $ACCOUNT $NICE --time=${HARDTIMELIMIT} --cpu-freq=highm1 ${EXCLUSIVE} --output=/dev/null run_fscip.sh
 		else
 		    # -V to copy all environment variables
 		    qsub -l walltime=$HARDTIMELIMIT -l mem=$HARDMEMLIMIT -l nodes=1:ppn=$PPN -N ${JOBNAME} \
 			-v SOLVERPATH=$SCIPPATH,EXECNAME=${EXECNAME},BASENAME=$FILENAME,FILENAME=$INSTANCE,CLIENTTMPDIR=$CLIENTTMPDIR \
-			-V -q $CLUSTERQUEUE -o /dev/null -e /dev/null run.sh
+			-V -q $CLUSTERQUEUE -o /dev/null -e /dev/null run_fscip.sh
 		fi
 	    done # end for SETNAME
 	done # end for PERMUTE
