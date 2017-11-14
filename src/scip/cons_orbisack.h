@@ -13,18 +13,19 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file   cons_orbitope.h
+/**@file   cons_orbisack.h
  * @ingroup CONSHDLRS
- * @brief  constraint handler for (partitioning/packing/full) orbitope constraints w.r.t. the full symmetric group
- * @author Timo Berthold
- * @author Marc Pfetsch
+ * @brief  constraint handler for orbisack constraints
  * @author Christopher Hojny
+ *
+ * The constraint works on two vectors of variables, which are interpreted as columns of a matrix such that the first
+ * column is lexicographically not smaller than the second.
  */
 
 /*---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----0----+----1----+----2*/
 
-#ifndef __SCIP_CONS_ORBITOPE_H__
-#define __SCIP_CONS_ORBITOPE_H__
+#ifndef __SCIP_CONS_ORBISACK_H__
+#define __SCIP_CONS_ORBISACK_H__
 
 #include "scip/scip.h"
 
@@ -32,65 +33,73 @@
 extern "C" {
 #endif
 
-
-/** creates the handler for orbitope constraints and includes it in SCIP
- *
- * @ingroup ConshdlrIncludes
- */
-EXTERN
-SCIP_RETCODE SCIPincludeConshdlrOrbitope(
-   SCIP*                 scip                /**< SCIP data structure */
-   );
-
 /**@addtogroup CONSHDLRS
  *
  * @{
  *
- * @name Orbitope Constraints
+ * @name Orbisack Constraints
  *
  * @{
  *
  * This constraint handler can be used to handle symmetries in certain 0/1-programs. The principle
- * structure is that some variables can be ordered in matrix form, such that permuting columns does
- * not change the validity and objective function value of a solution. That is, the symmetry group
- * of the program contains the full symmetric group obtained by permuting the columns of this
- * matrix. These symmetries can be handled by so-called full orbitopes.
- *
- * Moreover, if the variables in each row are contained in set packing or partitioning
- * constraint, these symmetries can be handled by specialized packing or partitioning orbitopes.
+ * structure is that some variables can be ordered in matrix form with two columns, such that
+ * permuting both columns does not change the validity and objective function value of a solution.
+ * That is, there exists a permutation symmetry of the program that permutes the variables of the
+ * first and second column row-wise.
  *
  * In more mathematical terms the structure has to be as follows: There are 0/1-variables
- * \f$x_{ij}\f$, \f$i \in \{1, \dots, p\}\f$, \f$j \in \{1, \dots, q\}\f$. The variables may be coupled
- * through set packing or partitioning constraints:
- * \f[
- *    \sum_{j = 1}^q x_{ij} \leq 1  \quad \mbox{or} \quad \sum_{j = 1}^q x_{ij} = 1 \quad \mbox{for all }i = 1, \ldots, p.
- * \f]
- * Permuting columns of \f$x\f$ does not change the validity and objective function value of any feasible solution.
+ * \f$x_{ij}\f$, \f$i \in \{1, \dots, n\}\f$, \f$j \in \{1, 2\}\f$. Permuting columns of
+ * \f$x\f$ does not change the validity and objective function value of any feasible solution.
  */
 
-/** type of orbitope constraint: full, packing, or partitioning orbitope */
-enum SCIP_OrbitopeType
-{
-   SCIP_ORBITOPETYPE_FULL         = 0,       /**< constraint is a full orbitope constraint:         rowsum(x) unrestricted */
-   SCIP_ORBITOPETYPE_PARTITIONING = 1,       /**< constraint is a partitioning orbitope constraint: rowsum(x) == 1 */
-   SCIP_ORBITOPETYPE_PACKING      = 2        /**< constraint is a packing orbitope constraint:      rowsum(x) <= 1 */
-};
-typedef enum SCIP_OrbitopeType SCIP_ORBITOPETYPE;
+/** separate orbisack solutions */
+EXTERN
+SCIP_RETCODE SCIPseparateCoversOrbisack(
+   SCIP*                 scip,               /**< pointer to scip */
+   SCIP_CONS*            cons,               /**< pointer to constraint for which cover inequality should be added */
+   SCIP_SOL*             sol,                /**< solution to be separated */
+   SCIP_VAR**            vars1,              /**< variables of first columns */
+   SCIP_VAR**            vars2,              /**< variables of second columns */
+   int                   nrows,              /**< number of rows */
+   SCIP_Bool*            infeasible,         /**< memory address to store whether we detected infeasibility */
+   int*                  ngen                /**< memory address to store number of generated cuts */
+   );
 
-/** creates and captures a orbitope constraint
+
+/** checks whether a given binary solution is feasible for the orbisack */
+EXTERN
+SCIP_RETCODE SCIPcheckSolutionOrbisack(
+   SCIP*              scip,               /**< SCIP data structure */
+   SCIP_SOL*          sol,                /**< solution to check for feasibility */
+   SCIP_VAR**         vars1,              /**< variables of first column */
+   SCIP_VAR**         vars2,              /**< variables of second column */
+   int                nrows,              /**< number of rows */
+   SCIP_Bool          printreason,        /**< whether reason for infeasibility should be printed */
+   SCIP_Bool*         feasible            /**< memory address to store whether sol is feasible */
+   );
+
+
+/** creates the handler for orbisack constraints and includes it in SCIP */
+EXTERN
+SCIP_RETCODE SCIPincludeConshdlrOrbisack(
+   SCIP*                 scip                /**< SCIP data structure */
+   );
+
+
+/** creates and captures a orbisack constraint
  *
  *  @note the constraint gets captured, hence at one point you have to release it using the method SCIPreleaseCons()
  */
 EXTERN
-SCIP_RETCODE SCIPcreateConsOrbitope(
+SCIP_RETCODE SCIPcreateConsOrbisack(
    SCIP*                 scip,               /**< SCIP data structure */
    SCIP_CONS**           cons,               /**< pointer to hold the created constraint */
    const char*           name,               /**< name of constraint */
-   SCIP_VAR***           vars,               /**< matrix of variables on which the symmetry acts */
-   SCIP_ORBITOPETYPE     orbitopetype,       /**< type of orbitope constraint */
-   int                   nspcons,            /**< number of set partitioning/packing constraints  <=> p */
-   int                   nblocks,            /**< number of symmetric variable blocks             <=> q */
-   SCIP_Bool             resolveprop,        /**< should propagation be resolved? */
+   SCIP_VAR*const*       vars1,              /**< first column matrix of variables on which the symmetry acts */
+   SCIP_VAR*const*       vars2,              /**< second column matrix of variables on which the symmetry acts */
+   int                   nrows,              /**< number of rows in variable matrix */
+   SCIP_Bool             ispporbisack,       /**< whether the orbisack is a packing/partitioning orbisack */
+   SCIP_Bool             isparttype,         /**< whether the orbisack is a partitioning orbisack */
    SCIP_Bool             initial,            /**< should the LP relaxation of constraint be in the initial LP?
                                               *   Usually set to TRUE. Set to FALSE for 'lazy constraints'. */
    SCIP_Bool             separate,           /**< should the constraint be separated during LP processing?
@@ -116,29 +125,25 @@ SCIP_RETCODE SCIPcreateConsOrbitope(
                                               *   Usually set to FALSE. Set to TRUE to for constraints that represent node data. */
    );
 
-/** creates and captures an orbitope constraint
- *  in its most basic variant, i. e., with all constraint flags set to their default values, which can be set
- *  afterwards using SCIPsetConsFLAGNAME() in scip.h
+/** creates and captures an orbisack constraint in its most basic variant
  *
- *  @see SCIPcreateConsOrbitope() for the default constraint flag configuration
+ *  All constraint flags set to their default values, which can be set afterwards using SCIPsetConsFLAGNAME() in scip.h.
+ *
+ *  @see SCIPcreateConsOrbisack() for the default constraint flag configuration
  *
  *  @note the constraint gets captured, hence at one point you have to release it using the method SCIPreleaseCons()
  */
 EXTERN
-SCIP_RETCODE SCIPcreateConsBasicOrbitope(
+SCIP_RETCODE SCIPcreateConsBasicOrbisack(
    SCIP*                 scip,               /**< SCIP data structure */
    SCIP_CONS**           cons,               /**< pointer to hold the created constraint */
    const char*           name,               /**< name of constraint */
-   SCIP_VAR***           vars,               /**< matrix of variables on which the symmetry acts */
-   SCIP_ORBITOPETYPE     orbitopetype,       /**< type of orbitope constraint */
-   int                   nspcons,            /**< number of set partitioning/packing constraints  <=> p */
-   int                   nblocks,            /**< number of symmetric variable blocks             <=> q */
-   SCIP_Bool             resolveprop         /**< should propagation be resolved? */
+   SCIP_VAR**            vars1,              /**< first column of matrix of variables on which the symmetry acts */
+   SCIP_VAR**            vars2,              /**< second column of matrix of variables on which the symmetry acts */
+   int                   nrows,              /**< number of rows in constraint matrix */
+   SCIP_Bool             ispporbisack,       /**< whether the orbisack is a packing/partitioning orbisack */
+   SCIP_Bool             isparttype          /**< whether the orbisack is a partitioning orbisack */
    );
-
-/* @} */
-
-/* @} */
 
 #ifdef __cplusplus
 }
