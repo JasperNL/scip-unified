@@ -9,11 +9,11 @@
 /*  SCIP is distributed under the terms of the ZIB Academic License.         */
 /*                                                                           */
 /*  You should have received a copy of the ZIB Academic License              */
-/*  along with SCIP; see the file COPYING. If not email to scip@zib.de.      */
+/*  along with SCIP; see the file COPYING. If not visit scip.zib.de.         */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file   CAP/src/cmain.c
+/**@file   SCFLP/src/cmain.c
  * @brief  Main file for capacitated facility location example
  * @author Stephen J. Maher
  *
@@ -30,7 +30,7 @@
 #include "scip/cons_benderslp.h"
 #include "scip/benders_default.h"
 
-#include "reader_cap.h"
+#include "reader_scflp.h"
 
 /** creates a SCIP instance with default plugins, evaluates command line parameters, runs SCIP appropriately,
  *  and frees the SCIP instance
@@ -51,8 +51,8 @@ SCIP_RETCODE runShell(
    /* initialize SCIP */
    SCIP_CALL( SCIPcreate(&scip) );
 
-   /* include CAP reader */
-   SCIP_CALL( SCIPincludeReaderCap(scip) );
+   /* include SCFLP reader */
+   SCIP_CALL( SCIPincludeReaderScflp(scip) );
 
    /* include default SCIP plugins */
    SCIP_CALL( SCIPincludeDefaultPlugins(scip) );
