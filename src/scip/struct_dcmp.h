@@ -3,7 +3,7 @@
 /*                  This file is part of the program and library             */
 /*         SCIP --- Solving Constraint Integer Programs                      */
 /*                                                                           */
-/*    Copyright (C) 2002-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 2002-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SCIP is distributed under the terms of the ZIB Academic License.         */
@@ -25,7 +25,7 @@
 #define SRC_SCIP_STRUCT_DECOMP_H_
 
 #include "scip/type_misc.h"
-#include "scip/type_decomp.h"
+#include "scip/type_dcmp.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,7 +36,6 @@ struct SCIP_Decomp
 {
    SCIP_HASHMAP*         var2block;          /**< hash map from SCIP variables to block labels */
    SCIP_HASHMAP*         cons2block;         /**< hash map from SCIP constraints to block labels */
-   SCIP_Real             score;              /**< score of this decomposition */
    SCIP_Real             modularity;         /**< modularity score (comparison of within community edges and random decomposition) */
    SCIP_Real             areascore;          /**< area score (fraction of matrix area outside block assignments) of this decomposition */
    int                   idxlargestblock;    /**< index of the of the largest block (regarding the number of constraints) */
@@ -50,7 +49,7 @@ struct SCIP_Decomp
    int                   mindegree;          /**< the minimum degree of the block decomposition graph */
    int                   maxdegree;          /**< the maximum degree of the block decomposition graph */
    int                   ncomponents;        /**< the number of connected components in the block decomposition graph */
-   SCIP_Bool             haschanges;         /**< has this decomposition pending data structure updates? */
+   int                   narticulations;     /**< the number of articulation nodes in the block decomposition graph */
    SCIP_Bool             original;           /**< is this a decomposition in the original (TRUE) or transformed space? */
    SCIP_Bool             benderslabels;      /**< should the variables be labeled for the application of Benders' decomposition */
 };
