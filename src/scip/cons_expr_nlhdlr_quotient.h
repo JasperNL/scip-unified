@@ -9,28 +9,20 @@
 /*  SCIP is distributed under the terms of the ZIB Academic License.         */
 /*                                                                           */
 /*  You should have received a copy of the ZIB Academic License              */
-/*  along with SCIP; see the file COPYING. If not visit scip.zib.de.         */
+/*  along with SCIP; see the file COPYING. If not email to scip@zib.de.      */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file   sepa_rlt.h
- * @ingroup SEPARATORS
- * @brief  reformulation-linearization technique separator
+/**@file   cons_expr_nlhdlr_quotient.h
+ * @brief  quotient nonlinear handler
+ * @author Benjamin Mueller
  * @author Fabian Wegscheider
- *
- *
- * This seperator generates a collection of cuts constructed by the reformulation-linearization technique (RLT).
- * For an LP row L and a variable x in [lb,ub], L is multiplied either with (ub-x) or with (x-lb). All known terms that
- * appear in the product are replaced by their respective auxiliary variable and all unknown terms are replaced by a
- * suitable linear relaxation, e.g., McCormick. In general, the separator computes four different cuts for a row with
- * finite sides and a variable with finite bounds.
  */
 
 /*---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----0----+----1----+----2*/
 
-#ifndef __SCIP_SEPA_XYZ_H__
-#define __SCIP_SEPA_XYZ_H__
-
+#ifndef __SCIP_CONS_EXPR_NLHDLR_QUOTIENT_H__
+#define __SCIP_CONS_EXPR_NLHDLR_QUOTIENT_H__
 
 #include "scip/scip.h"
 
@@ -38,24 +30,15 @@
 extern "C" {
 #endif
 
-/** creates the RLT separator and includes it in SCIP
- *
- * @ingroup SeparatorIncludes
- */
+/** includes quotient nonlinear handler to consexpr */
 SCIP_EXPORT
-SCIP_RETCODE SCIPincludeSepaRlt(
-   SCIP*                 scip                /**< SCIP data structure */
-);
-
-/**@addtogroup SEPARATORS
- *
- * @{
- */
-
-/* @} */
+SCIP_RETCODE SCIPincludeConsExprNlhdlrQuotient(
+   SCIP*                 scip,               /**< SCIP data structure */
+   SCIP_CONSHDLR*        consexprhdlr        /**< expression constraint handler */
+   );
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif /* __SCIP_CONS_EXPR_NLHDLR_QUOTIENT_H__ */
