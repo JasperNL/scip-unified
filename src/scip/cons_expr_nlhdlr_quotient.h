@@ -9,23 +9,20 @@
 /*  SCIP is distributed under the terms of the ZIB Academic License.         */
 /*                                                                           */
 /*  You should have received a copy of the ZIB Academic License              */
-/*  along with SCIP; see the file COPYING. If not visit scip.zib.de.         */
-/*                                                                           */
-/*  This file was written by Giacomo Nannicini,                              */
-/*    Copyright (C) 2012 Singapore University of Technology and Design       */
+/*  along with SCIP; see the file COPYING. If not email to scip@zib.de.      */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file   sepa_gmi.h
- * @ingroup SEPARATORS
- * @brief  Gomory Mixed-Integer Cuts
- * @author Giacomo Nannicini
+/**@file   cons_expr_nlhdlr_quotient.h
+ * @brief  quotient nonlinear handler
+ * @author Benjamin Mueller
+ * @author Fabian Wegscheider
  */
 
 /*---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----0----+----1----+----2*/
 
-#ifndef __SCIP_SEPA_GMI_H__
-#define __SCIP_SEPA_GMI_H__
+#ifndef __SCIP_CONS_EXPR_NLHDLR_QUOTIENT_H__
+#define __SCIP_CONS_EXPR_NLHDLR_QUOTIENT_H__
 
 #include "scip/scip.h"
 
@@ -33,13 +30,15 @@
 extern "C" {
 #endif
 
-/** creates the GMI separator and includes it in SCIP */
-SCIP_RETCODE SCIPincludeSepaGMI(
-   SCIP*                 scip                /**< SCIP data structure */
+/** includes quotient nonlinear handler to consexpr */
+SCIP_EXPORT
+SCIP_RETCODE SCIPincludeConsExprNlhdlrQuotient(
+   SCIP*                 scip,               /**< SCIP data structure */
+   SCIP_CONSHDLR*        consexprhdlr        /**< expression constraint handler */
    );
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif /* __SCIP_CONS_EXPR_NLHDLR_QUOTIENT_H__ */
