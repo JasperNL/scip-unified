@@ -1,12 +1,3 @@
-Maximize
- obj: x1 + 2 x2 + 3 x3 + x4
-Subject To
- c1: - x1 + x2 + x3 + 10 x4 <= 20
- c2: x1 - 3 x2 + x3 <= 30
- c3: x2 - 3.5 x4 = 0
-Bounds
- 0 <= x1 <= 40
- 2 <= x4 <= 3
-General
- x4
-End
+version https://git-lfs.github.com/spec/v1
+oid sha256:36c3101bcde796e48f1eb6bb08c5efe801e4dce1c75053b93a90ee83cb0cdebd
+size 180
